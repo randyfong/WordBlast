@@ -61,7 +61,7 @@ export async function POST(req: Request) {
           : null;
 
       const query = `
-        INSERT INTO word_game_attempts (
+        INSERT INTO public.word_game_attempts (
           session_id,
           user_name,
           level_name,
@@ -128,7 +128,7 @@ export async function GET() {
     let dbAttempts: any[] = [];
     try {
       const result = await pool.query(`
-        SELECT * FROM word_game_attempts ORDER BY attempted_at DESC LIMIT 50;
+        SELECT * FROM public.word_game_attempts ORDER BY attempted_at DESC LIMIT 50;
       `);
       dbAttempts = result.rows;
     } catch (dbErr) {

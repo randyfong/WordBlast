@@ -440,7 +440,7 @@ function createMcpServer(): Server {
           const targetWord = args.targetWord as string | undefined;
 
           try {
-            let query = `SELECT * FROM word_game_attempts`;
+            let query = `SELECT * FROM public.word_game_attempts`;
             const params: any[] = [];
             if (targetWord) {
               query += ` WHERE UPPER(target_word) = $1`;

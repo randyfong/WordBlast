@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Gamepad2, BarChart2, Sparkles, Volume2, Eye, PartyPopper, Star } from 'lucide-react';
 import { ArcadeCabinet } from '@/components/arcade/ArcadeCabinet';
 import { TeacherDashboard } from '@/components/dashboard/TeacherDashboard';
+import { FluencyTrackerDashboard } from '@/components/dashboard/FluencyTrackerDashboard';
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<'ARCADE' | 'DASHBOARD'>('ARCADE');
@@ -73,7 +74,7 @@ export default function Home() {
                 }`}
               >
                 <BarChart2 className="w-4 h-4" />
-                <span className="hidden sm:inline">Grown-ups</span>
+                <span className="hidden sm:inline">Fluency Tracker</span>
               </button>
 
               <button
@@ -148,7 +149,7 @@ export default function Home() {
           </div>
         ) : (
           <div className="w-full animate-fadeIn">
-            <TeacherDashboard />
+            <FluencyTrackerDashboard />
           </div>
         )}
       </div>
