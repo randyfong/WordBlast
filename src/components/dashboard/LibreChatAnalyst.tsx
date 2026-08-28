@@ -26,6 +26,8 @@ import {
   LineChart,
   Trash2,
   RotateCcw,
+  ChevronDown,
+  ChevronUp,
 } from 'lucide-react';
 
 interface ChatMessage {
@@ -325,7 +327,15 @@ export function LibreChatAnalyst({ onRefreshData }: LibreChatAnalystProps) {
   const [showSqlEditor, setShowSqlEditor] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedModel, setSelectedModel] = useState('LibreChat + ClickHouse MCP');
+  const [expandedDetails, setExpandedDetails] = useState<Record<string, boolean>>({});
   const chatEndRef = useRef<HTMLDivElement>(null);
+
+  const toggleDetails = (msgId: string) => {
+    setExpandedDetails((prev) => ({
+      ...prev,
+      [msgId]: !prev[msgId],
+    }));
+  };
 
   useEffect(() => {
     // Initial welcome message + auto load initial phonics matrix graph
@@ -653,64 +663,112 @@ Connected to **ClickHouse** table \`public.word_game_attempts\`. Select a preset
                       : 'bg-slate-900 text-slate-200 border border-slate-800 rounded-tl-sm shadow-md'
                   }`}
                 >
-                  {/* Graph Toggle Header if Payload Exists */}
-                  {msg.dataPayload && (
-                    <div className="flex items-center justify-between border-b border-slate-800 pb-2 mb-3">
-                      <span className="text-xs font-extrabold text-purple-300 flex items-center gap-1.5">
-                        <BarChart3 className="w-4 h-4 text-purple-400" />
-                        <span>Interactive Visual Graph</span>
-                      </span>
+                  {/* If chatbot message has a visual graph */}
+                  {msg.dataPayload ? (
+                    <div className="space-y-3">
+                      {/* Render Visual Graph Prominently */}
+                      <MessageDataGraph payload={msg.dataPayload} />
 
-                      <button
-                        onClick={() => toggleViewMode(msg.id)}
-                        className="px-2.5 py-1 rounded-lg bg-slate-950 hover:bg-slate-800 border border-slate-800 text-xs font-semibold text-purple-300 flex items-center gap-1.5 transition-all cursor-pointer"
-                      >
-                        {msg.viewMode === 'graph' ? <MessageSquare className="w-3.5 h-3.5" /> : <BarChart3 className="w-3.5 h-3.5" />}
-                        <span>{msg.viewMode === 'graph' ? 'Show Markdown Text' : 'Show Graph'}</span>
-                      </button>
+                      {/* Expandable Details Button for Text & SQL */}
+                      <div className="pt-1 border-t border-slate-800/80">
+                        <button
+                          onClick={() => toggleDetails(msg.id)}
+                          className="w-full flex items-center justify-between px-3.5 py-2 rounded-xl bg-slate-950/80 hover:bg-slate-950 text-slate-300 hover:text-white border border-slate-800 text-xs font-bold transition-all cursor-pointer shadow-sm group"
+                        >
+                          <span className="flex items-center gap-2">
+                            <MessageSquare className="w-3.5 h-3.5 text-purple-400 group-hover:scale-110 transition-transform" />
+                            <span>
+                              {expandedDetails[msg.id]
+                                ? 'Hide Markdown Text Analysis & Query'
+                                : 'Show Text Analysis & Executed SQL Query (Expand)'}
+                            </span>
+                          </span>
+                          {expandedDetails[msg.id] ? (
+                            <ChevronUp className="w-4 h-4 text-purple-400" />
+                          ) : (
+                            <ChevronDown className="w-4 h-4 text-purple-400" />
+                          )}
+                        </button>
+                      </div>
+
+                      {/* Collapsible Section: Text & Executed SQL Query */}
+                      {expandedDetails[msg.id] && (
+                        <div className="space-y-3 pt-2 animate-fadeIn">
+                          <div className="prose prose-invert prose-sm max-w-none space-y-2 p-3 rounded-2xl bg-slate-950/60 border border-slate-800/80">
+                            {msg.text.split('\n').map((line, idx) => {
+                              if (line.startsWith('### ')) {
+                                return <h3 key={idx} className="text-base font-bold text-purple-300 mt-2 mb-1">{line.replace('### ', '')}</h3>;
+                              }
+                              if (line.startsWith('#### ')) {
+                                return <h4 key={idx} className="text-sm font-bold text-slate-100 mt-2 mb-1">{line.replace('#### ', '')}</h4>;
+                              }
+                              if (line.startsWith('|')) {
+                                return <div key={idx} className="font-mono text-xs overflow-x-auto my-1 text-slate-300 bg-slate-950/60 p-1.5 rounded-lg border border-slate-800">{line}</div>;
+                              }
+                              if (line.startsWith('- ')) {
+                                return (
+                                  <li key={idx} className="list-disc ml-4 text-slate-300">
+                                    {line.replace('- ', '')}
+                                  </li>
+                                );
+                              }
+                              return <p key={idx} className="my-1">{line}</p>;
+                            })}
+                          </div>
+
+                          {msg.executedSql && (
+                            <div className="p-3 rounded-2xl bg-slate-950 border border-slate-800 text-xs space-y-1 font-mono">
+                              <div className="flex items-center gap-1.5 text-[11px] text-emerald-400 font-semibold">
+                                <Code2 className="w-3.5 h-3.5" />
+                                <span>Executed ClickHouse Query:</span>
+                              </div>
+                              <div className="text-emerald-300 bg-slate-900 p-2 rounded-xl border border-slate-800 overflow-x-auto text-[11px]">
+                                {msg.executedSql}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    /* Messages without graphs (user prompts or text-only responses) */
+                    <div className="space-y-3">
+                      <div className="prose prose-invert prose-sm max-w-none space-y-3">
+                        {msg.text.split('\n').map((line, idx) => {
+                          if (line.startsWith('### ')) {
+                            return <h3 key={idx} className="text-base font-bold text-purple-300 mt-2 mb-1">{line.replace('### ', '')}</h3>;
+                          }
+                          if (line.startsWith('#### ')) {
+                            return <h4 key={idx} className="text-sm font-bold text-slate-100 mt-2 mb-1">{line.replace('#### ', '')}</h4>;
+                          }
+                          if (line.startsWith('|')) {
+                            return <div key={idx} className="font-mono text-xs overflow-x-auto my-1 text-slate-300 bg-slate-950/60 p-1.5 rounded-lg border border-slate-800">{line}</div>;
+                          }
+                          if (line.startsWith('- ')) {
+                            return (
+                              <li key={idx} className="list-disc ml-4 text-slate-300">
+                                {line.replace('- ', '')}
+                              </li>
+                            );
+                          }
+                          return <p key={idx} className="my-1">{line}</p>;
+                        })}
+                      </div>
+
+                      {msg.executedSql && (
+                        <div className="p-3 rounded-2xl bg-slate-900/90 border border-slate-800 text-xs space-y-1 font-mono">
+                          <div className="flex items-center gap-1.5 text-[11px] text-emerald-400 font-semibold">
+                            <Code2 className="w-3.5 h-3.5" />
+                            <span>Executed ClickHouse Query:</span>
+                          </div>
+                          <div className="text-emerald-300 bg-slate-950 p-2 rounded-xl border border-slate-800 overflow-x-auto text-[11px]">
+                            {msg.executedSql}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )}
-
-                  {/* Render Visual Graph when graph mode is active */}
-                  {msg.dataPayload && msg.viewMode !== 'text' && (
-                    <MessageDataGraph payload={msg.dataPayload} />
-                  )}
-
-                  <div className="prose prose-invert prose-sm max-w-none space-y-3">
-                    {msg.text.split('\n').map((line, idx) => {
-                      if (line.startsWith('### ')) {
-                        return <h3 key={idx} className="text-base font-bold text-purple-300 mt-2 mb-1">{line.replace('### ', '')}</h3>;
-                      }
-                      if (line.startsWith('#### ')) {
-                        return <h4 key={idx} className="text-sm font-bold text-slate-100 mt-2 mb-1">{line.replace('#### ', '')}</h4>;
-                      }
-                      if (line.startsWith('|')) {
-                        return <div key={idx} className="font-mono text-xs overflow-x-auto my-1 text-slate-300 bg-slate-950/60 p-1.5 rounded-lg border border-slate-800">{line}</div>;
-                      }
-                      if (line.startsWith('- ')) {
-                        return (
-                          <li key={idx} className="list-disc ml-4 text-slate-300">
-                            {line.replace('- ', '')}
-                          </li>
-                        );
-                      }
-                      return <p key={idx} className="my-1">{line}</p>;
-                    })}
-                  </div>
                 </div>
-
-                {/* Executed SQL Pill */}
-                {msg.executedSql && (
-                  <div className="p-3 rounded-2xl bg-slate-900/90 border border-slate-800 text-xs space-y-1 font-mono">
-                    <div className="flex items-center gap-1.5 text-[11px] text-emerald-400 font-semibold">
-                      <Code2 className="w-3.5 h-3.5" />
-                      <span>Executed ClickHouse Query:</span>
-                    </div>
-                    <div className="text-emerald-300 bg-slate-950 p-2 rounded-xl border border-slate-800 overflow-x-auto text-[11px]">
-                      {msg.executedSql}
-                    </div>
-                  </div>
-                )}
 
                 <div className={`text-[10px] text-slate-400 px-2 ${msg.sender === 'user' ? 'text-right' : ''}`}>
                   {msg.timestamp}
