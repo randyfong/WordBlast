@@ -88,6 +88,14 @@ export default function Home() {
                 <Gamepad2 className="w-4 h-4" />
                 <span>Play</span>
               </button>
+
+              <a
+                href="/librechat"
+                className="flex items-center gap-1.5 px-3 md:px-4 py-2 rounded-xl text-sm font-extrabold text-[#7657e8] hover:bg-[#7657e8]/10 transition-all"
+              >
+                <Sparkles className="w-4 h-4 text-[#7657e8]" />
+                <span className="hidden md:inline">LibreChat</span>
+              </a>
             </div>
           </div>
         </div>
