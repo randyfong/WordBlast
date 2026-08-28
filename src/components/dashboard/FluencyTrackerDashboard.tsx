@@ -10,7 +10,9 @@ import {
   Send,
   Zap,
   CheckCircle2,
-  Clock
+  Clock,
+  ChevronDown,
+  User
 } from 'lucide-react';
 
 interface PatternBreakdown {
@@ -49,16 +51,27 @@ interface FluencyData {
   patternBreakdowns: PatternBreakdown[];
 }
 
+const STUDENT_OPTIONS = [
+  { id: 'stu_4a_maya', name: 'Maya Lin (4th Grade)' },
+  { id: 'stu_4a_leo', name: 'Leo R. (4th Grade)' },
+  { id: 'stu_4a_ella', name: 'Ella V. (4th Grade)' },
+  { id: 'stu_4a_logan', name: 'Logan R. (4th Grade)' },
+  { id: 'stu_4a_sammy', name: 'Sammy T. (4th Grade)' },
+  { id: 'stu_4a_ava', name: 'Ava K. (4th Grade)' },
+  { id: 'stu_4a_noah', name: 'Noah C. (4th Grade)' },
+];
+
 export const FluencyTrackerDashboard: React.FC = () => {
+  const [selectedStudentId, setSelectedStudentId] = useState('stu_4a_maya');
   const [data, setData] = useState<FluencyData | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [actionStatus, setActionStatus] = useState<string | null>(null);
 
-  const fetchFluencyData = async () => {
+  const fetchFluencyData = async (studentId = selectedStudentId) => {
     try {
       setRefreshing(true);
-      const res = await fetch('/api/fluency-insights');
+      const res = await fetch(`/api/fluency-insights?studentId=${studentId}`);
       if (res.ok) {
         const json = await res.json();
         setData(json);
@@ -72,10 +85,16 @@ export const FluencyTrackerDashboard: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchFluencyData();
-    const interval = setInterval(fetchFluencyData, 5000);
+    fetchFluencyData(selectedStudentId);
+    const interval = setInterval(() => fetchFluencyData(selectedStudentId), 5000);
     return () => clearInterval(interval);
-  }, []);
+  }, [selectedStudentId]);
+
+  const handleStudentChange = (newStudentId: string) => {
+    setSelectedStudentId(newStudentId);
+    setLoading(true);
+    fetchFluencyData(newStudentId);
+  };
 
   const handleSendPracticeRound = async (pattern?: string) => {
     setActionStatus('Sending 10-second targeted challenge...');
@@ -83,7 +102,7 @@ export const FluencyTrackerDashboard: React.FC = () => {
       const res = await fetch('/api/adaptive-generator', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ pattern }),
+        body: JSON.stringify({ pattern, studentId: selectedStudentId }),
       });
       if (res.ok) {
         const result = await res.json();
@@ -124,14 +143,33 @@ export const FluencyTrackerDashboard: React.FC = () => {
           <p className="text-sm text-slate-400">Shows exactly where students hesitate so you can provide helpful support.</p>
         </div>
 
-        <button
-          onClick={fetchFluencyData}
-          disabled={refreshing}
-          className="self-start sm:self-center flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#3b82f6]/20 hover:bg-[#3b82f6]/30 text-[#60a5fa] border border-[#3b82f6]/40 font-bold text-xs uppercase tracking-wider transition-all cursor-pointer shadow-md active:scale-95 disabled:opacity-50"
-        >
-          <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
-          <span>Refresh Data</span>
-        </button>
+        <div className="flex items-center gap-3">
+          {/* Quick Header Student Dropdown */}
+          <div className="relative">
+            <select
+              aria-label="Select Student User"
+              value={selectedStudentId}
+              onChange={(e) => handleStudentChange(e.target.value)}
+              className="bg-[#1e293b] border border-[#3b82f6]/40 hover:border-[#3b82f6] text-white text-xs font-bold rounded-xl px-3 py-2.5 appearance-none pr-8 cursor-pointer focus:outline-none"
+            >
+              {STUDENT_OPTIONS.map((st) => (
+                <option key={st.id} value={st.id} className="bg-[#1e293b] text-white">
+                  {st.name}
+                </option>
+              ))}
+            </select>
+            <ChevronDown className="w-4 h-4 text-[#60a5fa] absolute right-2.5 top-3 pointer-events-none" />
+          </div>
+
+          <button
+            onClick={() => fetchFluencyData(selectedStudentId)}
+            disabled={refreshing}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#3b82f6]/20 hover:bg-[#3b82f6]/30 text-[#60a5fa] border border-[#3b82f6]/40 font-bold text-xs uppercase tracking-wider transition-all cursor-pointer shadow-md active:scale-95 disabled:opacity-50"
+          >
+            <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
+            <span>Refresh</span>
+          </button>
+        </div>
       </header>
 
       {/* Top Grid: Recommended Focus & Student Profile */}
@@ -191,7 +229,7 @@ export const FluencyTrackerDashboard: React.FC = () => {
           )}
         </div>
 
-        {/* Student Profile */}
+        {/* Student Profile Card */}
         <div className="lg:col-span-5 flex flex-col justify-between p-6 rounded-2xl bg-[#2a364f] border border-slate-700/70 shadow-xl space-y-6">
           <div>
             <div className="flex items-center justify-between">
@@ -201,8 +239,8 @@ export const FluencyTrackerDashboard: React.FC = () => {
               </span>
             </div>
 
-            <h3 className="text-xl font-extrabold text-white mt-1">{data.studentProfile.name}</h3>
-            <p className="text-xs text-slate-400 font-medium">
+            <h3 className="text-xl font-extrabold text-white mt-2 tracking-tight">{data.studentProfile.name}</h3>
+            <p className="text-xs text-slate-400 font-medium mt-1">
               {data.studentProfile.grade} • {data.studentProfile.room}
             </p>
 
@@ -230,6 +268,7 @@ export const FluencyTrackerDashboard: React.FC = () => {
           </div>
         </div>
       </div>
+
 
       {/* Bottom Section: Word Pattern Pause Breakdown */}
       <div className="p-6 rounded-2xl bg-[#2a364f] border border-slate-700/70 shadow-xl space-y-6">

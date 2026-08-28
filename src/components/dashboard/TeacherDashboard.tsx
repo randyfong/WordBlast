@@ -16,8 +16,12 @@ import {
   Layers,
   Award,
   BookOpen,
-  UserCheck
+  UserCheck,
+  ChevronDown
 } from 'lucide-react';
+import { ClassroomLeaderboard } from './ClassroomLeaderboard';
+
+
 
 interface MatrixRow {
   pattern: string;
@@ -208,7 +212,7 @@ export const TeacherDashboard: React.FC = () => {
                 Active
               </span>
             </h4>
-            <div className="text-xs text-slate-400 mt-1">4th Grade • Room 204</div>
+            <div className="text-xs text-slate-400 mt-1 font-medium">4th Grade • Room 204</div>
           </div>
 
           <div className="grid grid-cols-2 gap-3 my-4">
@@ -361,37 +365,7 @@ export const TeacherDashboard: React.FC = () => {
         </div>
 
         {/* Student High Scores */}
-        <div className="p-6 rounded-3xl bg-slate-900/80 border border-slate-800 backdrop-blur-xl shadow-xl space-y-4">
-          <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-            <div className="flex items-center gap-2">
-              <Award className="w-4 h-4 text-amber-400" />
-              <h4 className="font-bold text-white text-base">Classroom Leaderboard</h4>
-            </div>
-            <span className="text-[11px] text-slate-400 font-medium">Top Scores</span>
-          </div>
-
-          <div className="space-y-2">
-            {highScores.map((hs, idx) => (
-              <div
-                key={hs.id}
-                className={`p-2.5 rounded-xl border flex items-center justify-between text-xs ${
-                  idx === 0 
-                    ? 'bg-amber-500/10 border-amber-500/40 text-amber-300' 
-                    : 'bg-black/40 border-slate-800 text-slate-300'
-                }`}
-              >
-                <div className="flex items-center gap-2">
-                  <span className="font-extrabold text-sm w-5">{idx + 1}.</span>
-                  <span className="font-bold text-white">{hs.name}</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span className="text-slate-400">{hs.streak}x streak</span>
-                  <span className="font-extrabold text-amber-400">{hs.score.toLocaleString()} pts</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+        <ClassroomLeaderboard limit={5} className="max-w-none" />
       </div>
     </div>
   );

@@ -133,16 +133,32 @@ export async function GET(req: Request) {
     };
 
     // 5. Synthesize LibreChat AI agent narrative payload
-    const studentName = 'Maya Lin (4th Grade)';
+    const STUDENT_ROSTER: Record<string, { name: string; grade: string; room: string; status: string; avgReadTimeSec: number; trend: string; wordsRead: number }> = {
+      'stu_4a_maya': { name: 'Maya Lin (4th Grade)', grade: '4th Grade', room: 'Room 204', status: 'Active', avgReadTimeSec: 0.3, trend: '+18% faster this week', wordsRead: 239 },
+      'stu_4a_leo': { name: 'Leo R. (4th Grade)', grade: '4th Grade', room: 'Room 204', status: 'Active', avgReadTimeSec: 0.4, trend: '+22% faster this week', wordsRead: 312 },
+      'stu_4a_ella': { name: 'Ella V. (4th Grade)', grade: '4th Grade', room: 'Room 204', status: 'Active', avgReadTimeSec: 0.5, trend: '+14% faster this week', wordsRead: 198 },
+      'stu_4a_logan': { name: 'Logan R. (4th Grade)', grade: '4th Grade', room: 'Room 204', status: 'Practicing', avgReadTimeSec: 0.7, trend: '+8% faster this week', wordsRead: 156 },
+      'stu_4a_sammy': { name: 'Sammy T. (4th Grade)', grade: '4th Grade', room: 'Room 204', status: 'Active', avgReadTimeSec: 0.4, trend: '+15% faster this week', wordsRead: 267 },
+      'stu_4a_ava': { name: 'Ava K. (4th Grade)', grade: '4th Grade', room: 'Room 204', status: 'Active', avgReadTimeSec: 0.5, trend: '+19% faster this week', wordsRead: 210 },
+      'stu_4a_noah': { name: 'Noah C. (4th Grade)', grade: '4th Grade', room: 'Room 204', status: 'Active', avgReadTimeSec: 0.6, trend: '+11% faster this week', wordsRead: 184 },
+    };
+
+    const targetRoster = STUDENT_ROSTER[studentId] || STUDENT_ROSTER['stu_4a_maya'];
+    const studentName = targetRoster.name;
     const blendRow = patternBreakdowns.find((p) => p.patternKey === 'blends') || { accuracyPercent: 95, pauseDurationSec: 0.4 };
 
     const aiSummaryNarrative = `Instead of just showing an overall grade score, the tracker shows that ${studentName} reads ${blendRow.accuracyPercent}% of standard letter blends smoothly (${blendRow.pauseDurationSec}s pause), but hesitates for an average of ${focusItem.pauseDurationSec} seconds exclusively on silent-letter and vowel team words.`;
 
     const readingTip = `Speaking words out loud helps connect visual spelling with spoken sounds for lasting word memory.`;
 
-    // Calculate overall student metrics
-    const totalWordsRead = (dbAttempts.length > 0 ? dbAttempts.length : events.length * 3) + 210;
-    const avgReadTimeSec = (liveMatrix.reduce((acc, curr) => acc + curr.avgLatencyMs, 0) / (liveMatrix.length || 1) / 1000).toFixed(1);
+    // Calculate overall student metrics for selected student
+    const studentAttempts = dbAttempts.filter((att) => 
+      att.user_name && studentName.toLowerCase().includes(att.user_name.toLowerCase().split(' ')[0])
+    );
+    const totalWordsRead = studentAttempts.length > 0 ? studentAttempts.length : targetRoster.wordsRead;
+    const avgReadTimeSec = studentAttempts.length > 0
+      ? (studentAttempts.reduce((acc, curr) => acc + Number(curr.pause_duration_seconds || 0.4), 0) / studentAttempts.length).toFixed(1)
+      : targetRoster.avgReadTimeSec;
 
     return NextResponse.json({
       success: true,
@@ -151,18 +167,18 @@ export async function GET(req: Request) {
       studentProfile: {
         id: studentId,
         name: studentName,
-        grade: '4th Grade',
-        room: 'Room 204',
-        status: 'Active',
-        avgReadTimeSec: parseFloat(avgReadTimeSec) || 0.6,
-        avgReadTimeTrend: '+18% faster this week',
+        grade: targetRoster.grade,
+        room: targetRoster.room,
+        status: targetRoster.status,
+        avgReadTimeSec: typeof avgReadTimeSec === 'number' ? avgReadTimeSec : parseFloat(avgReadTimeSec as any) || 0.3,
+        avgReadTimeTrend: targetRoster.trend,
         wordsReadCount: totalWordsRead,
       },
       recommendedFocus: {
         categoryLabel: focusItem.categoryLabel,
         patternKey: focusItem.patternKey,
         pauseLabel: `Needs Practice (>${focusItem.pauseDurationSec > 1 ? '1.0' : '0.5'}s Pause)`,
-        actionTitle: 'Send 10-second targeted word challenge to student',
+        actionTitle: `Send 10-second targeted word challenge to ${studentName.split(' ')[0]}`,
         actionButtonText: 'SEND PRACTICE ROUND',
         aiNarrative: aiSummaryNarrative,
       },
@@ -173,3 +189,4 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
+
