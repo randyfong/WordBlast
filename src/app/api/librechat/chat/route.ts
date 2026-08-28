@@ -53,10 +53,10 @@ export async function POST(req: Request) {
     const isPhonicsQuery = action === 'phonics_analysis' || 
       prompt?.toLowerCase().includes('pattern') || 
       prompt?.toLowerCase().includes('hesitation') || 
-      prompt?.toLowerCase().includes('graph') || 
-      prompt?.toLowerCase().includes('chart') || 
-      prompt?.toLowerCase().includes('result') || 
-      prompt?.toLowerCase().includes('analyze');
+      prompt?.toLowerCase().includes('phonics');
+
+    const isUserTxQuery = action === 'user_transactions' ||
+      (prompt?.toLowerCase().includes('user') && (prompt?.toLowerCase().includes('transaction') || prompt?.toLowerCase().includes('attempt') || prompt?.toLowerCase().includes('table') || prompt?.toLowerCase().includes('chart') || prompt?.toLowerCase().includes('bar')));
 
     if (action === 'custom_sql' && sqlQuery) {
       // Custom SQL execution
@@ -69,6 +69,34 @@ export async function POST(req: Request) {
         responseText += `\`\`\`sql\n${sqlQuery}\n\`\`\`\n\n`;
       } catch (sqlErr: any) {
         responseText = `⚠️ **ClickHouse SQL Error:** ${sqlErr.message}`;
+      }
+    } else if (isUserTxQuery) {
+      // User Transactions Breakdown Query & Bar Chart
+      executedSql = `SELECT user_name, COUNT(*) as transactions, SUM(score_earned) as total_score, ROUND(AVG(pause_duration_seconds)::numeric, 2) as avg_pause FROM public.word_game_attempts GROUP BY user_name ORDER BY transactions DESC;`;
+
+      try {
+        const sqlRes = await pool.query(executedSql);
+        const userRows = sqlRes.rows || [];
+
+        dataPayload = userRows.map((r: any) => ({
+          user_name: r.user_name,
+          transactions: Number(r.transactions),
+          total_score: Number(r.total_score || 0),
+          avg_pause: Number(r.avg_pause || 0),
+        }));
+
+        const totalTx = dataPayload.reduce((acc: number, u: any) => acc + u.transactions, 0);
+
+        responseText = `### 📊 User Transactions Bar Chart (\`public.word_game_attempts\`)\n\n`;
+        responseText += `Retrieved transaction counts for **${dataPayload.length} distinct users** (${totalTx} total transactions) from ClickHouse telemetry:\n\n`;
+        responseText += `#### User Transaction Breakdown:\n\n`;
+        responseText += `| User Name | Transactions | Total Score | Avg Pause (s) |\n`;
+        responseText += `| :--- | :---: | :---: | :---: |\n`;
+        dataPayload.forEach((u: any) => {
+          responseText += `| **${u.user_name}** | ${u.transactions} | ${u.total_score} pts | ${u.avg_pause}s |\n`;
+        });
+      } catch (err: any) {
+        responseText = `⚠️ **ClickHouse Query Error:** ${err.message}`;
       }
     } else if (isPhonicsQuery) {
       // Phonics Bottleneck Matrix & Graph
@@ -135,26 +163,42 @@ export async function POST(req: Request) {
       });
       responseText += `> **Instructional Scaffolding Tip**: Decrease cabinet scroll speed factor to **0.8x** and auto-trigger syllabic highlights if student hesitation exceeds **1.2 seconds**.\n`;
     } else {
-      // Default overview prompt response with Graph Payload
-      executedSql = `SELECT COUNT(*) as total_attempts, COUNT(DISTINCT user_name) as total_students, AVG(pause_duration_seconds) as avg_pause, SUM(CASE WHEN is_correct THEN 1 ELSE 0 END)*100.0/COUNT(*) as overall_accuracy FROM public.word_game_attempts;`;
+      // Default / General chat query strictly sourced from public.word_game_attempts
+      executedSql = `SELECT user_name, target_word, phonics_category, pause_duration_seconds, is_correct, score_earned FROM public.word_game_attempts ORDER BY attempted_at DESC LIMIT 50;`;
       
-      const matrix = buildPatternMatrix(dbAttempts);
-      dataPayload = matrix.length > 0 ? matrix : dbAttempts;
+      let queryRows: any[] = [];
+      try {
+        const sqlRes = await pool.query(executedSql);
+        queryRows = sqlRes.rows || [];
+      } catch (err: any) {
+        queryRows = dbAttempts;
+      }
 
       const totalAttempts = dbAttempts.length;
-      const totalStudents = new Set(dbAttempts.map((a) => a.user_name)).size;
+      const uniqueUsers = Array.from(new Set(dbAttempts.map((a) => a.user_name).filter(Boolean)));
       const correctCount = dbAttempts.filter((a) => a.is_correct).length;
       const accuracyPct = totalAttempts > 0 ? ((correctCount / totalAttempts) * 100).toFixed(1) : '0.0';
       const avgPause = totalAttempts > 0 ? (dbAttempts.reduce((acc, a) => acc + Number(a.pause_duration_seconds || 0), 0) / totalAttempts).toFixed(2) : '0.0';
 
-      responseText = `### 🤖 LibreChat ClickHouse Attempt Analyst\n\n`;
-      responseText += `I am connected to your **ClickHouse PostgreSQL database** table \`public.word_game_attempts\` via the WordBlast MCP Tool Engine.\n\n`;
-      responseText += `#### 📈 Live Telemetry Summary:\n`;
+      const matrix = buildPatternMatrix(dbAttempts);
+      dataPayload = matrix.length > 0 ? matrix : dbAttempts;
+
+      responseText = `### 🤖 LibreChat Telemetry Analyst (\`public.word_game_attempts\`)\n\n`;
+      responseText += `Source Table: **\`public.word_game_attempts\`**\n\n`;
+      responseText += `#### Live Telemetry Summary:\n`;
+      responseText += `- **Primary Database Table**: \`public.word_game_attempts\`\n`;
       responseText += `- **Total Attempt Records**: **${totalAttempts}**\n`;
-      responseText += `- **Active Students Tracked**: **${totalStudents}**\n`;
+      responseText += `- **Active Students Tracked**: **${uniqueUsers.length}** (${uniqueUsers.join(', ')})\n`;
       responseText += `- **Overall Accuracy Rate**: **${accuracyPct}%**\n`;
       responseText += `- **Average Vocalization Pause**: **${avgPause}s**\n\n`;
-      responseText += `I have generated an interactive graph of phonics hesitation latencies below. Select a quick action or ask a custom question to visualize more metrics!`;
+      responseText += `#### Recent Activity Stream (\`public.word_game_attempts\`):\n\n`;
+      responseText += `| User Name | Target Word | Phonics Category | Pause (s) | Result |\n`;
+      responseText += `| :--- | :--- | :--- | :---: | :---: |\n`;
+      queryRows.slice(0, 6).forEach((r) => {
+        const passIcon = r.is_correct ? '✅ Pass' : '❌ Miss';
+        responseText += `| **${r.user_name}** | \`${r.target_word}\` | ${r.phonics_category || 'blends'} | ${r.pause_duration_seconds}s | ${passIcon} |\n`;
+      });
+      responseText += `\n> 🛡️ **Source Table Enforcement**: All chat analysis, user transaction graphs, and SQL executions in this session are strictly sourced from \`public.word_game_attempts\`.`;
     }
 
     return NextResponse.json({

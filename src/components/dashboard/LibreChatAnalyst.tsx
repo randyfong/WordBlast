@@ -48,17 +48,105 @@ function MessageDataGraph({ payload }: { payload: any }) {
   const first = payload[0];
   if (!first || typeof first !== 'object') return null;
 
-  // 1. Check if payload matches Phonics Pattern Matrix
-  const isPatternMatrix =
-    first.pattern !== undefined ||
-    first.word_pattern !== undefined ||
-    first.category !== undefined ||
-    first.phonics_category !== undefined;
+  // 1. Check if payload matches User Transactions Aggregation
+  const isUserTransactions =
+    (first.user_name !== undefined || first.username !== undefined) &&
+    (first.transactions !== undefined || first.transaction_count !== undefined);
 
-  // 2. Check if payload matches Student Attempt Logs
+  // 2. Check if payload matches Phonics Pattern Matrix
+  const isPatternMatrix =
+    !isUserTransactions &&
+    (first.pattern !== undefined ||
+      first.word_pattern !== undefined ||
+      first.category !== undefined ||
+      first.phonics_category !== undefined);
+
+  // 3. Check if payload matches Student Attempt Logs
   const isStudentAttempts =
-    first.target_word !== undefined ||
-    first.pause_duration_seconds !== undefined;
+    !isUserTransactions &&
+    (first.target_word !== undefined ||
+      first.pause_duration_seconds !== undefined);
+
+  // Render User Transactions Bar Chart
+  if (isUserTransactions) {
+    const maxTransactions = Math.max(
+      ...payload.map((d: any) => Number(d.transactions || d.transaction_count || d.count || 0)),
+      1
+    );
+    const totalTx = payload.reduce(
+      (acc: number, d: any) => acc + Number(d.transactions || d.transaction_count || d.count || 0),
+      0
+    );
+
+    const gradients = [
+      'bg-gradient-to-r from-purple-600 to-pink-500 shadow-[0_0_12px_rgba(168,85,247,0.4)]',
+      'bg-gradient-to-r from-cyan-600 to-blue-500 shadow-[0_0_12px_rgba(6,182,212,0.4)]',
+      'bg-gradient-to-r from-emerald-600 to-teal-400 shadow-[0_0_12px_rgba(16,185,129,0.4)]',
+      'bg-gradient-to-r from-amber-600 to-yellow-400 shadow-[0_0_12px_rgba(245,158,11,0.4)]',
+      'bg-gradient-to-r from-rose-600 to-pink-400 shadow-[0_0_12px_rgba(244,63,94,0.4)]',
+    ];
+
+    return (
+      <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-4 animate-fadeIn my-3 shadow-inner">
+        <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+          <div className="flex items-center gap-2">
+            <BarChart3 className="w-4 h-4 text-purple-400" />
+            <span className="text-xs font-extrabold text-slate-200 uppercase tracking-wider">
+              Bar Chart: Transactions per User (<code className="text-purple-300 font-mono">public.word_game_attempts</code>)
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] text-cyan-300 bg-cyan-950/80 px-2 py-0.5 rounded font-mono border border-cyan-800">
+              {payload.length} Users
+            </span>
+            <span className="text-[10px] text-purple-300 bg-purple-950/80 px-2 py-0.5 rounded font-mono border border-purple-800">
+              {totalTx} Total Tx
+            </span>
+          </div>
+        </div>
+
+        <div className="space-y-3">
+          {payload.map((item: any, idx: number) => {
+            const userName = item.user_name || item.username || `User ${idx + 1}`;
+            const txCount = Number(item.transactions || item.transaction_count || item.count || 0);
+            const totalScore = item.total_score !== undefined ? Number(item.total_score) : null;
+            const avgPause = item.avg_pause !== undefined ? Number(item.avg_pause) : null;
+            const pct = Math.min(Math.max((txCount / maxTransactions) * 100, 5), 100);
+            const barColor = gradients[idx % gradients.length];
+
+            return (
+              <div key={idx} className="space-y-1.5 text-xs">
+                <div className="flex items-center justify-between text-slate-300 font-medium">
+                  <span className="flex items-center gap-2">
+                    <User className="w-3.5 h-3.5 text-purple-400 shrink-0" />
+                    <span className="font-bold text-slate-100 text-sm">{userName}</span>
+                  </span>
+                  <div className="flex items-center gap-2.5 font-mono text-[11px]">
+                    <span className="text-purple-300 font-bold bg-purple-950/60 px-2 py-0.5 rounded border border-purple-800/60">
+                      {txCount} transaction{txCount === 1 ? '' : 's'}
+                    </span>
+                    {totalScore !== null && (
+                      <span className="text-emerald-400 font-semibold">{totalScore} pts</span>
+                    )}
+                    {avgPause !== null && (
+                      <span className="text-amber-400 text-[10px]">{avgPause}s avg</span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="w-full bg-slate-900 h-4 rounded-full overflow-hidden flex items-center p-0.5 border border-slate-800">
+                  <div
+                    className={`h-full rounded-full transition-all duration-700 ${barColor}`}
+                    style={{ width: `${pct}%` }}
+                  />
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  }
 
   // Render Pattern Matrix Bar Chart
   if (isPatternMatrix) {
@@ -399,6 +487,14 @@ Connected to **ClickHouse** table \`public.word_game_attempts\`. Select a preset
 
             <div className="space-y-1.5">
               <button
+                onClick={() => handleSendPrompt('Show a bar chart of each user and their transactions using the public_word_game_attempts table', 'user_transactions')}
+                className="w-full text-left p-2.5 rounded-xl bg-slate-950/60 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-800 text-xs font-medium transition-all flex items-center gap-2 group cursor-pointer"
+              >
+                <PieChart className="w-4 h-4 text-pink-400 shrink-0 group-hover:scale-110 transition-transform" />
+                <span className="truncate">User Transactions Bar Chart</span>
+              </button>
+
+              <button
                 onClick={() => handleSendPrompt('Analyze phonics bottlenecks and hesitation times across all student attempts', 'phonics_analysis')}
                 className="w-full text-left p-2.5 rounded-xl bg-slate-950/60 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-800 text-xs font-medium transition-all flex items-center gap-2 group cursor-pointer"
               >
@@ -454,7 +550,7 @@ Connected to **ClickHouse** table \`public.word_game_attempts\`. Select a preset
       {/* Main Chat & SQL Drawer */}
       <div className="flex-1 flex flex-col bg-slate-950 h-full overflow-hidden">
         {/* Chat Top Controls Bar */}
-        <div className="p-3 bg-slate-900/90 border-b border-slate-800 flex items-center justify-between text-xs">
+        <div className="px-5 py-3 bg-slate-900 border-b border-slate-800 flex items-center justify-between text-xs shrink-0 z-10">
           <div className="flex items-center gap-2 text-slate-300 font-bold">
             <MessageSquare className="w-4 h-4 text-purple-400" />
             <span>LibreChat Session</span>
@@ -463,7 +559,7 @@ Connected to **ClickHouse** table \`public.word_game_attempts\`. Select a preset
 
           <button
             onClick={handleClearChat}
-            className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-rose-950/60 hover:bg-rose-900 text-rose-300 border border-rose-800 text-xs font-bold transition-all cursor-pointer shadow-sm"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-950/60 hover:bg-rose-900 text-rose-300 border border-rose-800 text-xs font-bold transition-all cursor-pointer shadow-sm"
             title="Clear Chat History"
           >
             <RotateCcw className="w-3.5 h-3.5 text-rose-400" />

@@ -254,6 +254,68 @@ export default function LibreChatPage() {
               </div>
             </div>
 
+            {/* User Transactions Bar Chart Section */}
+            {studentSummary.length > 0 && (
+              <div className="p-6 rounded-3xl bg-slate-900 border border-slate-800 space-y-4 shadow-2xl">
+                <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+                  <div className="flex items-center gap-2">
+                    <BarChart3 className="w-5 h-5 text-purple-400" />
+                    <h3 className="text-sm font-extrabold text-slate-100 uppercase tracking-wider">
+                      User Transactions Bar Chart (<code className="text-purple-300 font-mono">public.word_game_attempts</code>)
+                    </h3>
+                  </div>
+                  <span className="text-xs font-mono text-cyan-400 bg-cyan-950 px-2.5 py-1 rounded-lg border border-cyan-800">
+                    {studentSummary.length} Labeled Users
+                  </span>
+                </div>
+
+                <div className="space-y-4 pt-1">
+                  {(() => {
+                    const maxTx = Math.max(...studentSummary.map((s) => Number(s.totalAttempts || 0)), 1);
+                    const gradients = [
+                      'bg-gradient-to-r from-purple-600 via-purple-500 to-pink-500 shadow-[0_0_12px_rgba(168,85,247,0.4)]',
+                      'bg-gradient-to-r from-cyan-600 via-blue-500 to-indigo-500 shadow-[0_0_12px_rgba(6,182,212,0.4)]',
+                      'bg-gradient-to-r from-emerald-600 via-teal-500 to-cyan-400 shadow-[0_0_12px_rgba(16,185,129,0.4)]',
+                      'bg-gradient-to-r from-amber-600 via-orange-500 to-yellow-400 shadow-[0_0_12px_rgba(245,158,11,0.4)]',
+                      'bg-gradient-to-r from-rose-600 via-pink-500 to-purple-500 shadow-[0_0_12px_rgba(244,63,94,0.4)]',
+                    ];
+
+                    return studentSummary.map((student, idx) => {
+                      const pct = Math.min(Math.max((student.totalAttempts / maxTx) * 100, 5), 100);
+                      const barColor = gradients[idx % gradients.length];
+
+                      return (
+                        <div key={student.userName} className="space-y-1.5 text-xs">
+                          <div className="flex items-center justify-between text-slate-300 font-medium">
+                            <span className="flex items-center gap-2">
+                              <span className="w-6 h-6 rounded-lg bg-slate-950 border border-slate-800 flex items-center justify-center text-purple-400 text-xs font-bold font-mono">
+                                #{idx + 1}
+                              </span>
+                              <span className="font-bold text-slate-100 text-sm">{student.userName}</span>
+                            </span>
+                            <div className="flex items-center gap-3 font-mono text-[11px]">
+                              <span className="text-purple-300 font-bold bg-purple-950/80 px-2.5 py-0.5 rounded-lg border border-purple-800">
+                                {student.totalAttempts} transaction{student.totalAttempts === 1 ? '' : 's'}
+                              </span>
+                              <span className="text-emerald-400 font-semibold">{student.totalScore} pts</span>
+                              <span className="text-amber-300 text-[10px]">{student.avgPauseSec}s avg pause</span>
+                            </div>
+                          </div>
+
+                          <div className="w-full bg-slate-950 h-4.5 rounded-full overflow-hidden flex items-center p-0.5 border border-slate-800">
+                            <div
+                              className={`h-full rounded-full transition-all duration-700 ${barColor}`}
+                              style={{ width: `${pct}%` }}
+                            />
+                          </div>
+                        </div>
+                      );
+                    });
+                  })()}
+                </div>
+              </div>
+            )}
+
             {/* Phonics Pattern Matrix Summary */}
             <div className="p-6 rounded-3xl bg-slate-900 border border-slate-800 space-y-4">
               <h3 className="text-sm font-bold text-slate-200 uppercase tracking-wider flex items-center gap-2">
