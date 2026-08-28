@@ -45,7 +45,22 @@ const SPEED_CONFIG: Record<SpeedPreset, { label: string; shortLabel: string; fal
   HYPER: { label: '2.0x Hyper', shortLabel: '2.0x', fallStep: 1.25, spawnIntervalMs: 1600, badgeColor: 'text-white border-[#7657e8] bg-[#7657e8]' },
 };
 
-export const ArcadeCabinet: React.FC = () => {
+interface ArcadeCabinetProps {
+  studentName?: string;
+}
+
+const SPEED_NUMERIC: Record<SpeedPreset, number> = {
+  CREEP: 0.05,
+  ZEN: 0.1,
+  ULTRA_SLOW: 0.25,
+  SLOW: 0.5,
+  NORMAL: 1.0,
+  FAST: 1.5,
+  HYPER: 2.0,
+};
+
+export const ArcadeCabinet: React.FC<ArcadeCabinetProps> = ({ studentName = 'Player 1' }) => {
+  const [sessionId, setSessionId] = useState<string>(() => crypto.randomUUID());
   const [gameState, setGameState] = useState<'INSERT_COIN' | 'PLAYING' | 'PAUSED' | 'GAME_OVER'>('INSERT_COIN');
   const [score, setScore] = useState(0);
   const [streak, setStreak] = useState(0);
@@ -76,6 +91,15 @@ export const ArcadeCabinet: React.FC = () => {
   const currentThemeRef = useRef<StoryTheme>(currentTheme);
   currentThemeRef.current = currentTheme;
 
+  const streakRef = useRef<number>(streak);
+  streakRef.current = streak;
+
+  const sessionIdRef = useRef<string>(sessionId);
+  sessionIdRef.current = sessionId;
+
+  const studentNameRef = useRef<string>(studentName);
+  studentNameRef.current = studentName;
+
   // Handle Voice Match
   const handleWordBlast = useCallback((matchedWord: string, speechTimestamp: number) => {
     const list = activeWordsRef.current;
@@ -93,7 +117,7 @@ export const ArcadeCabinet: React.FC = () => {
       'WRIST': ['RIST', 'WRIST'],
       'WRITTEN': ['RITTEN', 'WRITTEN'],
       'WRESTLE': ['RESTLE', 'WRESTLE'],
-      'WRONG': ['RONG', 'WRONG'],
+      'WRONG': ['WRONG', 'WRONG'],
       'WRECK': ['RECK', 'WRECK'],
       'WREATH': ['REATH', 'WREATH'],
       'WRATH': ['RATH', 'WRATH'],
@@ -142,6 +166,7 @@ export const ArcadeCabinet: React.FC = () => {
       const speedBonus = Math.max(0, Math.round((2000 - latency) / 10));
       const scaffoldPenalty = isScaffolded ? 0.7 : 1.0;
       const roundScore = Math.round((basePoints + speedBonus) * multiplier * scaffoldPenalty);
+      const currentStreak = streakRef.current;
 
       setScore(s => s + roundScore);
       setStreak(st => {
@@ -157,13 +182,25 @@ export const ArcadeCabinet: React.FC = () => {
         scaffold: isScaffolded
       });
 
-      // Log ClickHouse Telemetry Ingest via API
+      // Log transaction to PostgreSQL word_game_attempts & ClickHouse telemetry via API
       fetch('/api/telemetry', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          studentId: 'stu_4a_player',
-          studentName: 'Player 1 (4th Grade)',
+          sessionId: sessionIdRef.current,
+          userName: studentNameRef.current,
+          levelName: currentThemeRef.current.title,
+          speedMultiplier: SPEED_NUMERIC[gameSpeedRef.current],
+          targetWord: target.wordData.word,
+          wordPattern: target.wordData.pattern,
+          phonicsCategory: target.wordData.categoryLabel,
+          isCorrect: true,
+          pauseDurationSeconds: Number((latency / 1000).toFixed(2)),
+          cluesTriggered: isScaffolded ? 1 : 0,
+          streakCountAtAttempt: currentStreak,
+          scoreEarned: roundScore,
+          studentId: 'stu_player',
+          studentName: studentNameRef.current,
           word: target.wordData.word,
           phonicsPattern: target.wordData.pattern,
           categoryLabel: target.wordData.categoryLabel,
@@ -286,21 +323,35 @@ export const ArcadeCabinet: React.FC = () => {
             } catch {
               // ignore
             }
+            const currentStreak = streakRef.current;
+            const pauseSec = Number((elapsed / 1000).toFixed(2));
             setStreak(0);
             setMultiplier(1);
             
-            // Log Miss to Telemetry
+            // Log Miss to PostgreSQL word_game_attempts & ClickHouse Telemetry
             fetch('/api/telemetry', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
-                studentId: 'stu_4a_player',
-                studentName: 'Player 1 (4th Grade)',
+                sessionId: sessionIdRef.current,
+                userName: studentNameRef.current,
+                levelName: currentThemeRef.current.title,
+                speedMultiplier: SPEED_NUMERIC[gameSpeedRef.current],
+                targetWord: item.wordData.word,
+                wordPattern: item.wordData.pattern,
+                phonicsCategory: item.wordData.categoryLabel,
+                isCorrect: false,
+                pauseDurationSeconds: pauseSec,
+                cluesTriggered: scaffolded ? 1 : 0,
+                streakCountAtAttempt: currentStreak,
+                scoreEarned: 0,
+                studentId: 'stu_player',
+                studentName: studentNameRef.current,
                 word: item.wordData.word,
                 phonicsPattern: item.wordData.pattern,
                 categoryLabel: item.wordData.categoryLabel,
-                latencyMs: 2500,
-                hesitationMs: 2400,
+                latencyMs: Math.round(elapsed),
+                hesitationMs: Math.max(0, Math.round(elapsed) - 100),
                 accuracyScore: 0.0,
                 scaffoldTriggered: scaffolded,
                 timeGapToPhonemeMs: 200
@@ -347,6 +398,9 @@ export const ArcadeCabinet: React.FC = () => {
     } catch {
       // ignore
     }
+    const newSession = crypto.randomUUID();
+    setSessionId(newSession);
+    sessionIdRef.current = newSession;
     setScore(0);
     setStreak(0);
     setMultiplier(1);

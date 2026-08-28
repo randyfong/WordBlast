@@ -111,7 +111,7 @@ export default function Home() {
               </p>
             </section>
             {/* Arcade Cabinet */}
-            <ArcadeCabinet />
+            <ArcadeCabinet studentName={studentName} />
 
             {/* Explainer Cards Grid */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-5xl mx-auto">
