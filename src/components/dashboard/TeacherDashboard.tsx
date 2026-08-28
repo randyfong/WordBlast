@@ -123,15 +123,15 @@ export const TeacherDashboard: React.FC = () => {
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="px-2.5 py-0.5 text-xs font-bold rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">
-              LIVE CLASSROOM INSIGHTS
+              LIVE CLASSROOM HIGHLIGHTS
             </span>
             <span className="text-xs text-slate-400">4th-Grade Reading Progress</span>
           </div>
           <h2 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight">
-            Reading Fluency & Pause Tracker
+            Student Reading Speed & Hesitation Tracker
           </h2>
           <p className="text-slate-400 text-sm mt-1">
-            Shows exactly where students hesitate so you can provide helpful support.
+            Shows where students pause before speaking so you can give helpful support.
           </p>
         </div>
 
@@ -154,7 +154,7 @@ export const TeacherDashboard: React.FC = () => {
           <div className="flex items-center justify-between gap-4 mb-4">
             <div className="flex items-center gap-2 text-amber-400 text-xs font-bold uppercase tracking-wider">
               <AlertTriangle className="w-4 h-4" />
-              <span>Recommended Focus Area</span>
+              <span>Recommended Practice Area</span>
             </div>
             <span className="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 text-xs font-semibold">
               Needs Practice (&gt;1.0s Pause)
@@ -163,7 +163,7 @@ export const TeacherDashboard: React.FC = () => {
 
           <div className="space-y-3">
             <h3 className="text-xl font-bold text-white">
-              Word Pattern Needing Attention:{' '}
+              Word Group Needing Extra Practice:{' '}
               <span className="text-amber-400 font-bold underline decoration-amber-500">
                 {criticalCategory ? criticalCategory.categoryLabel : 'Silent Letter Words (kn-, wr-, gn-)'}
               </span>
@@ -242,15 +242,15 @@ export const TeacherDashboard: React.FC = () => {
             <div className="flex items-center gap-2">
               <BarChart3 className="w-5 h-5 text-cyan-400" />
               <h3 className="text-xl font-bold text-white">
-                Word Pattern Pause Breakdown
+                Word Reading Speed & Pauses
               </h3>
             </div>
             <p className="text-xs text-slate-400 mt-1">
-              Average pause time before speaking each type of word. Pauses over 1.0 second highlight patterns that need practice.
+              Average pause before speaking each word group. Pauses over 1.0 second highlight word types to practice.
             </p>
           </div>
           <span className="text-xs text-slate-400 font-medium">
-            GOAL: Under 1.0s pause
+            GOAL: Under 1.0 second pause
           </span>
         </div>
 
@@ -326,7 +326,7 @@ export const TeacherDashboard: React.FC = () => {
             <div className="flex items-center gap-2">
               <Activity className="w-4 h-4 text-emerald-400" />
               <h4 className="font-bold text-white text-base">
-                Live Student Activity Stream
+                Live Student Reading Activity
               </h4>
             </div>
             <span className="text-[11px] font-bold text-emerald-400 animate-pulse">

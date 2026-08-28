@@ -86,7 +86,7 @@ export const STORY_THEMES: StoryTheme[] = [
       {
         word: 'BEACON',
         pattern: 'vowel-team-ea',
-        categoryLabel: 'Vowel Team (EA)',
+        categoryLabel: 'Vowel Pair (EA)',
         syllables: ['BEA', 'CON'],
         phoneticBreakdown: [
           { chunk: 'B', type: 'consonant', color: 'text-gray-300 border-gray-400' },
@@ -100,7 +100,7 @@ export const STORY_THEMES: StoryTheme[] = [
       {
         word: 'SHIELD',
         pattern: 'digraph-sh',
-        categoryLabel: 'Digraph (SH)',
+        categoryLabel: 'Letter Combo (SH)',
         syllables: ['SHIELD'],
         phoneticBreakdown: [
           { chunk: 'SH', type: 'blend', color: 'text-pink-400 border-pink-500' },
@@ -141,7 +141,7 @@ export const STORY_THEMES: StoryTheme[] = [
       {
         word: 'REACH',
         pattern: 'vowel-team-ea',
-        categoryLabel: 'Vowel Team (EA)',
+        categoryLabel: 'Vowel Pair (EA)',
         syllables: ['REACH'],
         phoneticBreakdown: [
           { chunk: 'R', type: 'consonant', color: 'text-cyan-400 border-cyan-500' },
@@ -179,7 +179,7 @@ export const STORY_THEMES: StoryTheme[] = [
       {
         word: 'DOLPHIN',
         pattern: 'digraph-ph',
-        categoryLabel: 'Digraph (PH)',
+        categoryLabel: 'Letter Combo (PH)',
         syllables: ['DOL', 'PHIN'],
         phoneticBreakdown: [
           { chunk: 'DOL', type: 'consonant', color: 'text-blue-400 border-blue-500' },
@@ -192,7 +192,7 @@ export const STORY_THEMES: StoryTheme[] = [
       {
         word: 'STREAM',
         pattern: 'vowel-team-ea',
-        categoryLabel: 'Vowel Team (EA)',
+        categoryLabel: 'Vowel Pair (EA)',
         syllables: ['STRE', 'AM'],
         phoneticBreakdown: [
           { chunk: 'STR', type: 'blend', color: 'text-yellow-400 border-yellow-500' },
@@ -220,7 +220,7 @@ export const STORY_THEMES: StoryTheme[] = [
       {
         word: 'PHANTOM',
         pattern: 'digraph-ph',
-        categoryLabel: 'Digraph (PH)',
+        categoryLabel: 'Letter Combo (PH)',
         syllables: ['PHAN', 'TOM'],
         phoneticBreakdown: [
           { chunk: 'PH', type: 'blend', color: 'text-cyan-400 border-cyan-500' },
@@ -260,7 +260,7 @@ export const STORY_THEMES: StoryTheme[] = [
       {
         word: 'FLOAT',
         pattern: 'vowel-team-oa',
-        categoryLabel: 'Vowel Team (OA)',
+        categoryLabel: 'Vowel Pair (OA)',
         syllables: ['FLOAT'],
         phoneticBreakdown: [
           { chunk: 'FL', type: 'blend', color: 'text-cyan-400 border-cyan-500' },
@@ -274,7 +274,7 @@ export const STORY_THEMES: StoryTheme[] = [
       {
         word: 'SHARK',
         pattern: 'digraph-sh',
-        categoryLabel: 'Digraph (SH)',
+        categoryLabel: 'Letter Combo (SH)',
         syllables: ['SHARK'],
         phoneticBreakdown: [
           { chunk: 'SH', type: 'blend', color: 'text-purple-400 border-purple-500' },
@@ -287,7 +287,7 @@ export const STORY_THEMES: StoryTheme[] = [
       {
         word: 'SHELL',
         pattern: 'digraph-sh',
-        categoryLabel: 'Digraph (SH)',
+        categoryLabel: 'Letter Combo (SH)',
         syllables: ['SHELL'],
         phoneticBreakdown: [
           { chunk: 'SH', type: 'blend', color: 'text-purple-400 border-purple-500' },
@@ -300,7 +300,7 @@ export const STORY_THEMES: StoryTheme[] = [
       {
         word: 'BEACH',
         pattern: 'vowel-team-ea',
-        categoryLabel: 'Vowel Team (EA)',
+        categoryLabel: 'Vowel Pair (EA)',
         syllables: ['BEACH'],
         phoneticBreakdown: [
           { chunk: 'B', type: 'consonant', color: 'text-cyan-400 border-cyan-500' },
@@ -391,7 +391,7 @@ export const STORY_THEMES: StoryTheme[] = [
       {
         word: 'LEAF',
         pattern: 'vowel-team-ea',
-        categoryLabel: 'Vowel Team (EA)',
+        categoryLabel: 'Vowel Pair (EA)',
         syllables: ['LEAF'],
         phoneticBreakdown: [
           { chunk: 'L', type: 'consonant', color: 'text-cyan-400 border-cyan-500' },
@@ -405,7 +405,7 @@ export const STORY_THEMES: StoryTheme[] = [
       {
         word: 'CHIRP',
         pattern: 'digraph-ch',
-        categoryLabel: 'Digraph (CH)',
+        categoryLabel: 'Letter Combo (CH)',
         syllables: ['CHIRP'],
         phoneticBreakdown: [
           { chunk: 'CH', type: 'blend', color: 'text-purple-400 border-purple-500' },
@@ -432,7 +432,7 @@ export const STORY_THEMES: StoryTheme[] = [
       {
         word: 'SHADE',
         pattern: 'digraph-sh',
-        categoryLabel: 'Digraph (SH)',
+        categoryLabel: 'Letter Combo (SH)',
         syllables: ['SHADE'],
         phoneticBreakdown: [
           { chunk: 'SH', type: 'blend', color: 'text-purple-400 border-purple-500' },
@@ -482,7 +482,7 @@ export const STORY_THEMES: StoryTheme[] = [
       {
         word: 'SHADOW',
         pattern: 'digraph-sh',
-        categoryLabel: 'Digraph (SH)',
+        categoryLabel: 'Letter Combo (SH)',
         syllables: ['SHA', 'DOW'],
         phoneticBreakdown: [
           { chunk: 'SH', type: 'blend', color: 'text-pink-400 border-pink-500' },
@@ -550,7 +550,7 @@ export const STORY_THEMES: StoryTheme[] = [
       {
         word: 'LAUNCH',
         pattern: 'digraph-ch',
-        categoryLabel: 'Digraph (CH)',
+        categoryLabel: 'Letter Combo (CH)',
         syllables: ['LAUNCH'],
         phoneticBreakdown: [
           { chunk: 'L', type: 'consonant', color: 'text-cyan-400 border-cyan-500' },
@@ -577,7 +577,7 @@ export const STORY_THEMES: StoryTheme[] = [
       {
         word: 'SHINE',
         pattern: 'digraph-sh',
-        categoryLabel: 'Digraph (SH)',
+        categoryLabel: 'Letter Combo (SH)',
         syllables: ['SHINE'],
         phoneticBreakdown: [
           { chunk: 'SH', type: 'blend', color: 'text-purple-400 border-purple-500' },
@@ -613,7 +613,7 @@ export const STORY_THEMES: StoryTheme[] = [
       {
         word: 'BRANCH',
         pattern: 'digraph-ch',
-        categoryLabel: 'Digraph (CH)',
+        categoryLabel: 'Letter Combo (CH)',
         syllables: ['BRANCH'],
         phoneticBreakdown: [
           { chunk: 'BR', type: 'blend', color: 'text-green-400 border-green-500' },
@@ -640,7 +640,7 @@ export const STORY_THEMES: StoryTheme[] = [
       {
         word: 'CHOMP',
         pattern: 'digraph-ch',
-        categoryLabel: 'Digraph (CH)',
+        categoryLabel: 'Letter Combo (CH)',
         syllables: ['CHOMP'],
         phoneticBreakdown: [
           { chunk: 'CH', type: 'blend', color: 'text-pink-400 border-pink-500' },
@@ -666,7 +666,7 @@ export const STORY_THEMES: StoryTheme[] = [
       {
         word: 'ROAR',
         pattern: 'vowel-team-oa',
-        categoryLabel: 'Vowel Team (OA)',
+        categoryLabel: 'Vowel Pair (OA)',
         syllables: ['ROAR'],
         phoneticBreakdown: [
           { chunk: 'R', type: 'consonant', color: 'text-cyan-400 border-cyan-500' },
@@ -719,7 +719,7 @@ export const STORY_THEMES: StoryTheme[] = [
       {
         word: 'TAIL',
         pattern: 'vowel-team-ai',
-        categoryLabel: 'Vowel Team (AI)',
+        categoryLabel: 'Vowel Pair (AI)',
         syllables: ['TAIL'],
         phoneticBreakdown: [
           { chunk: 'T', type: 'consonant', color: 'text-cyan-400 border-cyan-500' },
@@ -756,7 +756,7 @@ export const STORY_THEMES: StoryTheme[] = [
       {
         word: 'PHONE',
         pattern: 'digraph-ph',
-        categoryLabel: 'Digraph (PH)',
+        categoryLabel: 'Letter Combo (PH)',
         syllables: ['PHONE'],
         phoneticBreakdown: [
           { chunk: 'PH', type: 'blend', color: 'text-cyan-400 border-cyan-500' },
@@ -795,7 +795,7 @@ export const STORY_THEMES: StoryTheme[] = [
       {
         word: 'SHIELD',
         pattern: 'digraph-sh',
-        categoryLabel: 'Digraph (SH)',
+        categoryLabel: 'Letter Combo (SH)',
         syllables: ['SHIELD'],
         phoneticBreakdown: [
           { chunk: 'SH', type: 'blend', color: 'text-pink-400 border-pink-500' },
@@ -809,7 +809,7 @@ export const STORY_THEMES: StoryTheme[] = [
       {
         word: 'CHIP',
         pattern: 'digraph-ch',
-        categoryLabel: 'Digraph (CH)',
+        categoryLabel: 'Letter Combo (CH)',
         syllables: ['CHIP'],
         phoneticBreakdown: [
           { chunk: 'CH', type: 'blend', color: 'text-purple-400 border-purple-500' },
@@ -835,7 +835,7 @@ export const STORY_THEMES: StoryTheme[] = [
       {
         word: 'GRAPH',
         pattern: 'digraph-ph',
-        categoryLabel: 'Digraph (PH)',
+        categoryLabel: 'Letter Combo (PH)',
         syllables: ['GRAPH'],
         phoneticBreakdown: [
           { chunk: 'GR', type: 'blend', color: 'text-cyan-400 border-cyan-500' },
@@ -876,7 +876,7 @@ export const STORY_THEMES: StoryTheme[] = [
       {
         word: 'FLASH',
         pattern: 'digraph-sh',
-        categoryLabel: 'Digraph (SH)',
+        categoryLabel: 'Letter Combo (SH)',
         syllables: ['FLASH'],
         phoneticBreakdown: [
           { chunk: 'FL', type: 'blend', color: 'text-cyan-400 border-cyan-500' },
@@ -900,7 +900,7 @@ export const STORY_THEMES: StoryTheme[] = [
       {
         word: 'COACH',
         pattern: 'vowel-team-oa',
-        categoryLabel: 'Vowel Team (OA)',
+        categoryLabel: 'Vowel Pair (OA)',
         syllables: ['COACH'],
         phoneticBreakdown: [
           { chunk: 'C', type: 'consonant', color: 'text-cyan-400 border-cyan-500' },
@@ -914,7 +914,7 @@ export const STORY_THEMES: StoryTheme[] = [
       {
         word: 'FLOAT',
         pattern: 'vowel-team-oa',
-        categoryLabel: 'Vowel Team (OA)',
+        categoryLabel: 'Vowel Pair (OA)',
         syllables: ['FLOAT'],
         phoneticBreakdown: [
           { chunk: 'FL', type: 'blend', color: 'text-green-400 border-green-500' },
@@ -1007,7 +1007,7 @@ export const STORY_THEMES: StoryTheme[] = [
       {
         word: 'CHAIN',
         pattern: 'vowel-team-ai',
-        categoryLabel: 'Vowel Team (AI)',
+        categoryLabel: 'Vowel Pair (AI)',
         syllables: ['CHAIN'],
         phoneticBreakdown: [
           { chunk: 'CH', type: 'blend', color: 'text-purple-400 border-purple-500' },
@@ -1021,7 +1021,7 @@ export const STORY_THEMES: StoryTheme[] = [
       {
         word: 'BEAD',
         pattern: 'vowel-team-ea',
-        categoryLabel: 'Vowel Team (EA)',
+        categoryLabel: 'Vowel Pair (EA)',
         syllables: ['BEAD'],
         phoneticBreakdown: [
           { chunk: 'B', type: 'consonant', color: 'text-cyan-400 border-cyan-500' },
@@ -1045,7 +1045,7 @@ export const STORY_THEMES: StoryTheme[] = [
       {
         word: 'CHAMPION',
         pattern: 'digraph-ch',
-        categoryLabel: 'Digraph (CH)',
+        categoryLabel: 'Letter Combo (CH)',
         syllables: ['CHAM', 'PI', 'ON'],
         phoneticBreakdown: [
           { chunk: 'CH', type: 'blend', color: 'text-purple-400 border-purple-500' },
@@ -1060,7 +1060,7 @@ export const STORY_THEMES: StoryTheme[] = [
       {
         word: 'SPLASH',
         pattern: 'digraph-sh',
-        categoryLabel: 'Digraph (SH)',
+        categoryLabel: 'Letter Combo (SH)',
         syllables: ['SPLASH'],
         phoneticBreakdown: [
           { chunk: 'SPL', type: 'blend', color: 'text-cyan-400 border-cyan-500' },
@@ -1074,7 +1074,7 @@ export const STORY_THEMES: StoryTheme[] = [
       {
         word: 'SHOOT',
         pattern: 'digraph-sh',
-        categoryLabel: 'Digraph (SH)',
+        categoryLabel: 'Letter Combo (SH)',
         syllables: ['SHOOT'],
         phoneticBreakdown: [
           { chunk: 'SH', type: 'blend', color: 'text-purple-400 border-purple-500' },
@@ -1127,7 +1127,7 @@ export const STORY_THEMES: StoryTheme[] = [
       {
         word: 'COACH',
         pattern: 'vowel-team-oa',
-        categoryLabel: 'Vowel Team (OA)',
+        categoryLabel: 'Vowel Pair (OA)',
         syllables: ['COACH'],
         phoneticBreakdown: [
           { chunk: 'C', type: 'consonant', color: 'text-cyan-400 border-cyan-500' },
@@ -1141,7 +1141,7 @@ export const STORY_THEMES: StoryTheme[] = [
       {
         word: 'TEAM',
         pattern: 'vowel-team-ea',
-        categoryLabel: 'Vowel Team (EA)',
+        categoryLabel: 'Vowel Pair (EA)',
         syllables: ['TEAM'],
         phoneticBreakdown: [
           { chunk: 'T', type: 'consonant', color: 'text-cyan-400 border-cyan-500' },

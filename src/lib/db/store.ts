@@ -54,7 +54,7 @@ class ClickHouseDualStore {
         studentName: student.name,
         word: w,
         phonicsPattern: 'digraph-ph',
-        categoryLabel: 'Digraph (PH)',
+        categoryLabel: 'Letter Combo (PH)',
         latencyMs: 610 + Math.floor(Math.random() * 70),
         hesitationMs: 560 + Math.floor(Math.random() * 60),
         accuracyScore: 0.88,

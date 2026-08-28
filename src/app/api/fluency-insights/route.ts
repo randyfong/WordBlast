@@ -126,7 +126,7 @@ export async function GET(req: Request) {
 
     // Identify top bottleneck focus pattern
     const focusItem = patternBreakdowns[0] || {
-      categoryLabel: 'Vowel Team (EA)',
+      categoryLabel: 'Vowel Pair (EA)',
       pauseDurationSec: 6.20,
       accuracyPercent: 95,
       patternKey: 'vowel-team-ea'

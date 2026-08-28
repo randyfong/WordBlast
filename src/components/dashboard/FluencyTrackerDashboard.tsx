@@ -133,14 +133,14 @@ export const FluencyTrackerDashboard: React.FC = () => {
         <div className="space-y-1">
           <div className="flex items-center gap-2.5">
             <span className="px-3 py-1 rounded-full text-xs font-bold bg-[#10b981]/20 text-[#34d399] border border-[#10b981]/40 uppercase tracking-wider">
-              LIVE CLASSROOM INSIGHTS
+              LIVE CLASSROOM HIGHLIGHTS
             </span>
             <span className="text-xs text-slate-400 font-medium">4th-Grade Reading Progress</span>
           </div>
           <h1 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight flex items-center gap-2">
-            Reading Fluency & Pause Tracker
+            Student Reading Speed & Hesitation Tracker
           </h1>
-          <p className="text-sm text-slate-400">Shows exactly where students hesitate so you can provide helpful support.</p>
+          <p className="text-sm text-slate-400">Shows where students pause before speaking so you can give helpful support.</p>
         </div>
 
         <div className="flex items-center gap-3">
@@ -182,7 +182,7 @@ export const FluencyTrackerDashboard: React.FC = () => {
             <div className="flex items-center justify-between flex-wrap gap-2">
               <div className="flex items-center gap-2 text-amber-400 font-extrabold text-xs uppercase tracking-wider">
                 <AlertTriangle className="w-4 h-4 text-amber-400" />
-                <span>RECOMMENDED FOCUS AREA</span>
+                <span>RECOMMENDED PRACTICE AREA</span>
               </div>
               <span className="px-3 py-1 rounded-full text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40">
                 {data.recommendedFocus.pauseLabel}
@@ -191,7 +191,7 @@ export const FluencyTrackerDashboard: React.FC = () => {
 
             <div>
               <h2 className="text-lg md:text-xl font-bold text-white">
-                Word Pattern Needing Attention:{' '}
+                Word Group Needing Extra Practice:{' '}
                 <span className="text-amber-400 underline decoration-amber-400/50 underline-offset-4">
                   {data.recommendedFocus.categoryLabel}
                 </span>
@@ -233,7 +233,7 @@ export const FluencyTrackerDashboard: React.FC = () => {
         <div className="lg:col-span-5 flex flex-col justify-between p-6 rounded-2xl bg-[#2a364f] border border-slate-700/70 shadow-xl space-y-6">
           <div>
             <div className="flex items-center justify-between">
-              <p className="text-xs font-extrabold text-slate-400 uppercase tracking-wider">STUDENT PROFILE</p>
+              <p className="text-xs font-extrabold text-slate-400 uppercase tracking-wider">STUDENT SUMMARY</p>
               <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 uppercase">
                 {data.studentProfile.status}
               </span>
@@ -276,17 +276,17 @@ export const FluencyTrackerDashboard: React.FC = () => {
           <div>
             <div className="flex items-center gap-2 text-white font-extrabold text-lg">
               <BarChart3 className="w-5 h-5 text-cyan-400" />
-              <span>Word Pattern Pause Breakdown</span>
+              <span>Word Reading Speed & Pauses</span>
               <span className="ml-2 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-purple-500/20 text-purple-300 border border-purple-500/40 uppercase tracking-wider">
                 ⚡ {data.agentSource || 'LibreChat Agent'}
               </span>
             </div>
             <p className="text-xs text-slate-400 mt-0.5">
-              Average pause time before speaking each type of word. Pauses over 1.0 second highlight patterns that need practice.
+              Average pause before speaking each word group. Pauses over 1.0 second highlight word types to practice.
             </p>
           </div>
           <span className="text-xs font-bold text-slate-400 bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-700 self-start sm:self-center">
-            GOAL: Under 1.0s pause
+            GOAL: Under 1.0 second pause
           </span>
         </div>
 

@@ -73,18 +73,18 @@ export const PhonicsLegend: React.FC<PhonicsLegendProps> = ({ isOpen, onClose })
             </div>
           </div>
 
-          {/* Yellow / Vowel Teams */}
+          {/* Yellow / Vowel Pairs */}
           <div className="p-4 rounded-2xl bg-[#fff1bd] border-2 border-[#ffd166] flex items-start gap-4">
             <div className="px-3 py-1.5 rounded-xl bg-white border-2 border-yellow-500 font-mono font-black text-yellow-600 text-lg shadow-sm shrink-0">
               EA OA AI
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-extrabold text-[#9a6a00] text-base">🟡 Yellow = Vowel Teams</span>
+                <span className="font-extrabold text-[#9a6a00] text-base">🟡 Yellow = Vowel Pairs</span>
                 <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-yellow-100 text-yellow-800 border border-yellow-300">ONE VOWEL SOUND</span>
               </div>
               <p className="text-xs md:text-sm font-bold text-[#455d78] mt-1 leading-relaxed">
-                <strong>How to pronounce:</strong> Two vowels team up to make <em>one long sound</em>! Remember: <em>&ldquo;When two vowels go walking, the first one does the talking!&rdquo;</em> (e.g. B<span className="underline decoration-yellow-500 font-black">EA</span>CON sounds like &quot;BEE-con&quot;).
+                <strong>How to pronounce:</strong> Two vowels pair up to make <em>one long sound</em>! Remember: <em>&ldquo;When two vowels go walking, the first one does the talking!&rdquo;</em> (e.g. B<span className="underline decoration-yellow-500 font-black">EA</span>CON sounds like &quot;BEE-con&quot;).
               </p>
             </div>
           </div>
@@ -105,14 +105,14 @@ export const PhonicsLegend: React.FC<PhonicsLegendProps> = ({ isOpen, onClose })
             </div>
           </div>
 
-          {/* Purple / Digraphs */}
+          {/* Purple / Sound Combos */}
           <div className="p-4 rounded-2xl bg-[#f5eefb] border-2 border-[#7657e8] flex items-start gap-4">
             <div className="px-3 py-1.5 rounded-xl bg-white border-2 border-purple-500 font-mono font-black text-purple-600 text-lg shadow-sm shrink-0">
               PH SH CH
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-extrabold text-[#5137b9] text-base">🟣 Purple/Pink = Digraphs</span>
+                <span className="font-extrabold text-[#5137b9] text-base">🟣 Purple/Pink = Sound Combos</span>
                 <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-purple-100 text-purple-800 border border-purple-300">BRAND NEW SOUND</span>
               </div>
               <p className="text-xs md:text-sm font-bold text-[#455d78] mt-1 leading-relaxed">
