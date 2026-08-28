@@ -50,265 +50,118 @@ function MessageDataGraph({ payload }: { payload: any }) {
   const first = payload[0];
   if (!first || typeof first !== 'object') return null;
 
-  // 1. Check if payload matches User Transactions Aggregation
-  const isUserTransactions =
-    (first.user_name !== undefined || first.username !== undefined) &&
-    (first.transactions !== undefined || first.transaction_count !== undefined);
-
-  // 2. Check if payload matches Phonics Pattern Matrix
-  const isPatternMatrix =
-    !isUserTransactions &&
-    (first.pattern !== undefined ||
-      first.word_pattern !== undefined ||
-      first.category !== undefined ||
-      first.phonics_category !== undefined);
-
-  // 3. Check if payload matches Student Attempt Logs
-  const isStudentAttempts =
-    !isUserTransactions &&
-    (first.target_word !== undefined ||
-      first.pause_duration_seconds !== undefined);
-
-  // Render User Transactions Bar Chart
-  if (isUserTransactions) {
-    const maxTransactions = Math.max(
-      ...payload.map((d: any) => Number(d.transactions || d.transaction_count || d.count || 0)),
-      1
-    );
-    const totalTx = payload.reduce(
-      (acc: number, d: any) => acc + Number(d.transactions || d.transaction_count || d.count || 0),
-      0
-    );
-
-    const gradients = [
-      'bg-gradient-to-r from-purple-600 to-pink-500 shadow-[0_0_12px_rgba(168,85,247,0.4)]',
-      'bg-gradient-to-r from-cyan-600 to-blue-500 shadow-[0_0_12px_rgba(6,182,212,0.4)]',
-      'bg-gradient-to-r from-emerald-600 to-teal-400 shadow-[0_0_12px_rgba(16,185,129,0.4)]',
-      'bg-gradient-to-r from-amber-600 to-yellow-400 shadow-[0_0_12px_rgba(245,158,11,0.4)]',
-      'bg-gradient-to-r from-rose-600 to-pink-400 shadow-[0_0_12px_rgba(244,63,94,0.4)]',
-    ];
-
-    return (
-      <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-4 animate-fadeIn my-3 shadow-inner">
-        <div className="flex items-center justify-between border-b border-slate-800 pb-2">
-          <div className="flex items-center gap-2">
-            <BarChart3 className="w-4 h-4 text-purple-400" />
-            <span className="text-xs font-extrabold text-slate-200 uppercase tracking-wider">
-              Bar Chart: Transactions per User (<code className="text-purple-300 font-mono">public.word_game_attempts</code>)
-            </span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-[10px] text-cyan-300 bg-cyan-950/80 px-2 py-0.5 rounded font-mono border border-cyan-800">
-              {payload.length} Users
-            </span>
-            <span className="text-[10px] text-purple-300 bg-purple-950/80 px-2 py-0.5 rounded font-mono border border-purple-800">
-              {totalTx} Total Tx
-            </span>
-          </div>
-        </div>
-
-        <div className="space-y-3">
-          {payload.map((item: any, idx: number) => {
-            const userName = item.user_name || item.username || `User ${idx + 1}`;
-            const txCount = Number(item.transactions || item.transaction_count || item.count || 0);
-            const totalScore = item.total_score !== undefined ? Number(item.total_score) : null;
-            const avgPause = item.avg_pause !== undefined ? Number(item.avg_pause) : null;
-            const pct = Math.min(Math.max((txCount / maxTransactions) * 100, 5), 100);
-            const barColor = gradients[idx % gradients.length];
-
-            return (
-              <div key={idx} className="space-y-1.5 text-xs">
-                <div className="flex items-center justify-between text-slate-300 font-medium">
-                  <span className="flex items-center gap-2">
-                    <User className="w-3.5 h-3.5 text-purple-400 shrink-0" />
-                    <span className="font-bold text-slate-100 text-sm">{userName}</span>
-                  </span>
-                  <div className="flex items-center gap-2.5 font-mono text-[11px]">
-                    <span className="text-purple-300 font-bold bg-purple-950/60 px-2 py-0.5 rounded border border-purple-800/60">
-                      {txCount} transaction{txCount === 1 ? '' : 's'}
-                    </span>
-                    {totalScore !== null && (
-                      <span className="text-emerald-400 font-semibold">{totalScore} pts</span>
-                    )}
-                    {avgPause !== null && (
-                      <span className="text-amber-400 text-[10px]">{avgPause}s avg</span>
-                    )}
-                  </div>
-                </div>
-
-                <div className="w-full bg-slate-900 h-4 rounded-full overflow-hidden flex items-center p-0.5 border border-slate-800">
-                  <div
-                    className={`h-full rounded-full transition-all duration-700 ${barColor}`}
-                    style={{ width: `${pct}%` }}
-                  />
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    );
-  }
-
-  // Render Pattern Matrix Bar Chart
-  if (isPatternMatrix) {
-    const maxPause = Math.max(
-      ...payload.map((d) => Number(d.avgPauseSec || d.avg_pause || d.pause_duration_seconds || 0)),
-      5
-    );
-    return (
-      <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-4 animate-fadeIn my-3 shadow-inner">
-        <div className="flex items-center justify-between border-b border-slate-800 pb-2">
-          <div className="flex items-center gap-2">
-            <BarChart3 className="w-4 h-4 text-purple-400" />
-            <span className="text-xs font-extrabold text-slate-200 uppercase tracking-wider">
-              Graph: Phonics Vocalization Hesitation Latency (seconds)
-            </span>
-          </div>
-          <span className="text-[10px] text-purple-300 bg-purple-950/80 px-2 py-0.5 rounded font-mono border border-purple-800">
-            {payload.length} Patterns
-          </span>
-        </div>
-
-        <div className="space-y-3">
-          {payload.map((item: any, idx: number) => {
-            const label = item.category || item.phonics_category || item.pattern || item.word_pattern || `Item ${idx + 1}`;
-            const patternKey = item.pattern || item.word_pattern || '';
-            const pause = Number(item.avgPauseSec || item.avg_pause || item.pause_duration_seconds || 0);
-            const accuracy = item.accuracyPct ?? item.accuracy ?? item.accuracy_pct ?? 0;
-            const pct = Math.min(Math.max((pause / maxPause) * 100, 5), 100);
-            const isCritical = pause >= 7.0;
-            const isWarning = pause >= 4.0 && pause < 7.0;
-            const barColor = isCritical
-              ? 'bg-gradient-to-r from-rose-600 to-rose-400 shadow-[0_0_12px_rgba(244,63,94,0.4)]'
-              : isWarning
-              ? 'bg-gradient-to-r from-amber-600 to-amber-400 shadow-[0_0_12px_rgba(245,158,11,0.4)]'
-              : 'bg-gradient-to-r from-cyan-600 to-cyan-400 shadow-[0_0_12px_rgba(6,182,212,0.4)]';
-
-            return (
-              <div key={idx} className="space-y-1 text-xs">
-                <div className="flex items-center justify-between text-slate-300 font-medium">
-                  <span className="flex items-center gap-1.5">
-                    <span className="font-bold text-slate-100">{label}</span>
-                    {patternKey && <code className="text-[10px] text-slate-400 font-mono">({patternKey})</code>}
-                  </span>
-                  <div className="flex items-center gap-3 font-mono text-[11px]">
-                    <span className={isCritical ? 'text-rose-400 font-bold' : isWarning ? 'text-amber-400 font-bold' : 'text-cyan-400 font-bold'}>
-                      {pause.toFixed(2)}s pause
-                    </span>
-                    <span className="text-slate-400">{Number(accuracy).toFixed(0)}% acc</span>
-                  </div>
-                </div>
-
-                <div className="w-full bg-slate-900 h-3.5 rounded-full overflow-hidden flex items-center p-0.5 border border-slate-800">
-                  <div
-                    className={`h-full rounded-full transition-all duration-700 ${barColor}`}
-                    style={{ width: `${pct}%` }}
-                  />
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    );
-  }
-
-  // Render Student Attempt Timeline Chart
-  if (isStudentAttempts) {
-    const maxPause = Math.max(...payload.map((d) => Number(d.pause_duration_seconds || 0)), 5);
-    return (
-      <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-4 animate-fadeIn my-3 shadow-inner">
-        <div className="flex items-center justify-between border-b border-slate-800 pb-2">
-          <div className="flex items-center gap-2">
-            <Zap className="w-4 h-4 text-amber-400" />
-            <span className="text-xs font-extrabold text-slate-200 uppercase tracking-wider">
-              Graph: Student Vocal Pause Latency by Target Word
-            </span>
-          </div>
-          <div className="flex items-center gap-2 text-[10px] font-mono">
-            <span className="flex items-center gap-1 text-emerald-400"><span className="w-2 h-2 rounded-full bg-emerald-400" /> Pass</span>
-            <span className="flex items-center gap-1 text-rose-400"><span className="w-2 h-2 rounded-full bg-rose-400" /> Miss</span>
-          </div>
-        </div>
-
-        <div className="h-48 flex items-end justify-between gap-2 pt-6 pb-2 px-3 bg-slate-900/80 rounded-xl border border-slate-800/80">
-          {payload.slice(0, 14).map((item: any, idx: number) => {
-            const word = item.target_word || item.word || `Word ${idx + 1}`;
-            const pauseSec = Number(item.pause_duration_seconds || 0);
-            const heightPct = Math.min(Math.max((pauseSec / maxPause) * 100, 10), 100);
-            const isPass = Boolean(item.is_correct);
-
-            return (
-              <div key={idx} className="flex-1 flex flex-col items-center gap-1.5 group relative h-full justify-end">
-                <div className="opacity-0 group-hover:opacity-100 transition-opacity absolute -top-9 bg-slate-950 text-slate-100 text-[10px] p-1.5 rounded-lg border border-slate-700 whitespace-nowrap z-20 font-mono shadow-xl pointer-events-none">
-                  <strong>{word}</strong>: {pauseSec}s ({isPass ? 'Pass' : 'Miss'})
-                </div>
-
-                <div className="text-[10px] font-mono text-slate-400 group-hover:text-slate-100 font-bold">
-                  {pauseSec.toFixed(1)}s
-                </div>
-
-                <div className="w-full bg-slate-950/60 rounded-t-lg flex items-end overflow-hidden h-full max-h-32">
-                  <div
-                    className={`w-full rounded-t-lg transition-all duration-500 ${
-                      isPass
-                        ? 'bg-gradient-to-t from-emerald-600 to-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.3)]'
-                        : 'bg-gradient-to-t from-rose-600 to-rose-400 shadow-[0_0_10px_rgba(244,63,94,0.3)]'
-                    }`}
-                    style={{ height: `${heightPct}%` }}
-                  />
-                </div>
-
-                <span className="text-[10px] font-bold font-mono text-slate-300 truncate w-full text-center">
-                  {word}
-                </span>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    );
-  }
-
-  // Generic Fallback Bar Graph for Any Result Array
   const keys = Object.keys(first);
-  const labelKey = keys.find((k) => typeof first[k] === 'string') || keys[0];
-  const numKey = keys.find((k) => typeof first[k] === 'number' || (!isNaN(Number(first[k])) && k !== labelKey)) || keys[1];
 
-  if (!numKey) return null;
+  // 1. Identify Label Column (string/identifier)
+  const labelKey =
+    keys.find((k) => ['user_name', 'username', 'student', 'user', 'target_word', 'word', 'phonics_category', 'category', 'categoryLabel', 'word_pattern', 'pattern'].includes(k)) ||
+    keys.find((k) => typeof first[k] === 'string') ||
+    keys[0];
 
-  const maxVal = Math.max(...payload.map((d) => Number(d[numKey] || 0)), 1);
+  // 2. Identify Primary Metric Column to plot as bar length
+  const numericKeys = keys.filter((k) => {
+    const val = first[k];
+    return (typeof val === 'number' || (!isNaN(Number(val)) && val !== '')) && k !== labelKey && k !== 'id' && !k.endsWith('_id');
+  });
+
+  // Prioritize primary aggregated metrics from the SQL query
+  const metricKey =
+    numericKeys.find((k) => ['transactions', 'total_attempts', 'attempts', 'attempt_count', 'count', 'total_score', 'score_earned', 'accuracy_pct', 'accuracyPct', 'accuracy', 'avg_pause', 'avgPauseSec', 'pause_duration_seconds'].includes(k)) ||
+    numericKeys[0] ||
+    keys[1];
+
+  if (!metricKey || !labelKey) return null;
+
+  // Determine Title and Unit
+  let unit = '';
+  let metricTitle = metricKey.replace(/_/g, ' ');
+
+  if (['transactions', 'total_attempts', 'attempts', 'attempt_count', 'count'].includes(metricKey)) {
+    unit = 'tx';
+    metricTitle = 'Transaction / Attempt Count';
+  } else if (['total_score', 'score_earned', 'score', 'pts'].includes(metricKey)) {
+    unit = 'pts';
+    metricTitle = 'Total Arcade Score';
+  } else if (['accuracy_pct', 'accuracyPct', 'accuracy'].includes(metricKey)) {
+    unit = '%';
+    metricTitle = 'Accuracy Rate';
+  } else if (['avg_pause', 'avgPauseSec', 'pause_duration_seconds', 'pause'].includes(metricKey)) {
+    unit = 's';
+    metricTitle = 'Vocal Pause Latency';
+  }
+
+  const maxVal = Math.max(...payload.map((d: any) => Number(d[metricKey] || 0)), 1);
+  const totalVal = payload.reduce((acc: number, d: any) => acc + Number(d[metricKey] || 0), 0);
+
+  const gradients = [
+    'bg-gradient-to-r from-purple-600 via-purple-500 to-pink-500 shadow-[0_0_12px_rgba(168,85,247,0.4)]',
+    'bg-gradient-to-r from-cyan-600 via-blue-500 to-indigo-500 shadow-[0_0_12px_rgba(6,182,212,0.4)]',
+    'bg-gradient-to-r from-emerald-600 via-teal-500 to-cyan-400 shadow-[0_0_12px_rgba(16,185,129,0.4)]',
+    'bg-gradient-to-r from-amber-600 via-orange-500 to-yellow-400 shadow-[0_0_12px_rgba(245,158,11,0.4)]',
+    'bg-gradient-to-r from-rose-600 via-pink-500 to-purple-500 shadow-[0_0_12px_rgba(244,63,94,0.4)]',
+  ];
 
   return (
     <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-4 animate-fadeIn my-3 shadow-inner">
       <div className="flex items-center justify-between border-b border-slate-800 pb-2">
         <div className="flex items-center gap-2">
-          <BarChart3 className="w-4 h-4 text-purple-400" />
+          <BarChart3 className="w-4 h-4 text-purple-400 shrink-0" />
           <span className="text-xs font-extrabold text-slate-200 uppercase tracking-wider">
-            Graph: {numKey.replace(/_/g, ' ')} by {labelKey.replace(/_/g, ' ')}
+            Graph: {metricTitle} by {labelKey.replace(/_/g, ' ')} (<code className="text-purple-300 font-mono">public.word_game_attempts</code>)
           </span>
         </div>
-        <span className="text-[10px] text-purple-300 bg-purple-950/80 px-2 py-0.5 rounded font-mono border border-purple-800">
-          {payload.length} Rows
-        </span>
+        <div className="flex items-center gap-2 font-mono text-[10px]">
+          <span className="text-cyan-300 bg-cyan-950/80 px-2 py-0.5 rounded border border-cyan-800">
+            {payload.length} Rows
+          </span>
+          <span className="text-purple-300 bg-purple-950/80 px-2 py-0.5 rounded border border-purple-800">
+            {unit === '%' ? `${(totalVal / payload.length).toFixed(1)}% avg` : `${totalVal.toLocaleString()} total ${unit}`}
+          </span>
+        </div>
       </div>
 
-      <div className="space-y-2.5">
-        {payload.slice(0, 10).map((item: any, idx: number) => {
+      <div className="space-y-3">
+        {payload.slice(0, 15).map((item: any, idx: number) => {
           const label = String(item[labelKey] || `Row ${idx + 1}`);
-          const val = Number(item[numKey] || 0);
+          const rawVal = item[metricKey];
+          const val = typeof rawVal === 'number' ? rawVal : Number(rawVal || 0);
           const pct = Math.min(Math.max((val / maxVal) * 100, 5), 100);
+          const barColor = gradients[idx % gradients.length];
+
+          // Secondary metric badges
+          const score = item.total_score !== undefined || item.score_earned !== undefined ? Number(item.total_score ?? item.score_earned) : null;
+          const pause = item.avg_pause !== undefined || item.pause_duration_seconds !== undefined ? Number(item.avg_pause ?? item.pause_duration_seconds) : null;
+          const passes = item.pass_count !== undefined ? Number(item.pass_count) : null;
 
           return (
-            <div key={idx} className="space-y-1 text-xs">
+            <div key={idx} className="space-y-1.5 text-xs">
               <div className="flex items-center justify-between text-slate-300 font-medium">
-                <span className="font-bold text-slate-100">{label}</span>
-                <span className="font-mono text-purple-400 font-bold">{val}</span>
+                <span className="flex items-center gap-2">
+                  <span className="w-5 h-5 rounded-md bg-slate-900 border border-slate-800 flex items-center justify-center text-purple-400 text-[10px] font-bold font-mono">
+                    #{idx + 1}
+                  </span>
+                  <span className="font-bold text-slate-100 text-sm">{label}</span>
+                </span>
+
+                <div className="flex items-center gap-2.5 font-mono text-[11px]">
+                  <span className="text-purple-300 font-bold bg-purple-950/60 px-2 py-0.5 rounded border border-purple-800/60">
+                    {val.toLocaleString()} {unit}
+                  </span>
+                  {score !== null && metricKey !== 'total_score' && metricKey !== 'score_earned' && (
+                    <span className="text-emerald-400 font-semibold">{score.toLocaleString()} pts</span>
+                  )}
+                  {pause !== null && metricKey !== 'avg_pause' && metricKey !== 'pause_duration_seconds' && (
+                    <span className="text-amber-400 text-[10px]">{pause}s pause</span>
+                  )}
+                  {passes !== null && (
+                    <span className="text-cyan-400 text-[10px]">{passes} passes</span>
+                  )}
+                </div>
               </div>
-              <div className="w-full bg-slate-900 h-3 rounded-full overflow-hidden p-0.5 border border-slate-800">
+
+              <div className="w-full bg-slate-900 h-4 rounded-full overflow-hidden flex items-center p-0.5 border border-slate-800">
                 <div
-                  className="h-full rounded-full bg-gradient-to-r from-purple-600 to-pink-500 transition-all duration-700"
+                  className={`h-full rounded-full transition-all duration-700 ${barColor}`}
                   style={{ width: `${pct}%` }}
                 />
               </div>
